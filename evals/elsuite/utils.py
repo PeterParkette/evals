@@ -20,9 +20,7 @@ def get_answer(text, answer_prompt, ignore_case=False):
     else:
         idx = text.rfind(answer_prompt)
 
-    if idx == -1:
-        return None
-    return text[idx + len(answer_prompt) :]
+    return None if idx == -1 else text[idx + len(answer_prompt) :]
 
 
 def get_consensus(answers):
@@ -48,10 +46,7 @@ def fuzzy_match(s1: str, s2: str) -> bool:
     s1 = normalize(s1)
     s2 = normalize(s2)
 
-    if s1 == "" or s2 == "":
-        return s1 == s2
-
-    return s1 in s2 or s2 in s1
+    return s1 == s2 if s1 == "" or s2 == "" else s1 in s2 or s2 in s1
 
 
 def get_scores_from_text(text: str) -> dict:
@@ -63,14 +58,13 @@ def get_scores_from_text(text: str) -> dict:
 def get_yesno_from_text(text: str) -> dict:
     pattern = r"## (.+?)\n.+?([yn])"
     matches = re.findall(pattern, text, re.DOTALL)
-    return {k: v for k, v in dict(matches).items()}
+    return dict(dict(matches))
 
 
 def get_letter_from_data(data: str) -> str:
     last_y = (data.rfind("y"), "y")
     last_n = (data.rfind("n"), "n")
-    char = max(last_y, last_n)[1]
-    return char
+    return max(last_y, last_n)[1]
 
 
 def f1_score(prediction: str, answers: list[str]) -> float:
@@ -86,7 +80,7 @@ def f1_score(prediction: str, answers: list[str]) -> float:
         f1 = (2 * precision * recall) / (precision + recall)
         return f1
 
-    return max([_f1_score(prediction, answer) for answer in answers])
+    return max(_f1_score(prediction, answer) for answer in answers)
 
 
 def scrub_formatting_from_prompt(prompt):

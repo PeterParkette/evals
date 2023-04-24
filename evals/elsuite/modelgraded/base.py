@@ -38,13 +38,12 @@ class ModelGradedSpec:
             self.choice_strings = [string.ascii_uppercase[i % 26] for i in range(self.multicomp_n)]
         # make sure each choice doesn't contain any punctuation
         for s in self.choice_strings:
-            assert not any(c in s for c in string.punctuation), f"{s} contains punctuation"
+            assert all(c not in s for c in string.punctuation), f"{s} contains punctuation"
 
         #  (optional) 'choice_scores' is a dict that specifies the score for each choice string
         # if 'choice_scores' is specified, 'scores/' are computed and added to metrics
-        if self.choice_scores:
-            if self.choice_scores == "from_strings":
-                self.choice_scores = {c: float(c) for c in self.choice_strings}
+        if self.choice_scores and self.choice_scores == "from_strings":
+            self.choice_scores = {c: float(c) for c in self.choice_strings}
 
         if isinstance(self.prompt, str):
             self.prompt = [{"role": "user", "content": self.prompt}]

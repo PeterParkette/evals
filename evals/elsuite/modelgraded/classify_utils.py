@@ -55,9 +55,8 @@ def get_choice(text: str, eval_type: str, match_fn: Callable, choice_strings: It
 
 def concat_n_completions(completions: Iterable[str], template_i: str) -> str:
     """Concatenate n completions into a single text string."""
-    completion = ""
-    for i, completion_i in enumerate(completions):
-        completion += format_necessary(
+    completion = "".join(
+        format_necessary(
             template_i,
             i=i + 1,
             i_abc=string.ascii_lowercase[i % 26],
@@ -65,6 +64,8 @@ def concat_n_completions(completions: Iterable[str], template_i: str) -> str:
             output=completion_i,
             n=len(completions),
         )
+        for i, completion_i in enumerate(completions)
+    )
     return completion.strip()
 
 

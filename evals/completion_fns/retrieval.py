@@ -73,7 +73,7 @@ class RetrievalCompletionFn(CompletionFn):
             registry_path: The path to a registry file to add to default registry.
             _kwargs: Additional arguments to pass to the completion function instantiation.
         """
-        registry = Registry() if not registry else registry
+        registry = registry if registry else Registry()
         if registry_path:
             registry.add_registry_paths(registry_path)
 
