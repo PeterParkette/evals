@@ -53,7 +53,7 @@ class ModelBasedClassify(evals.Eval):
         self.metaeval = metaeval
         self.registry = registry
         if multicomp_n == "from_models":
-            assert n_models > 1, f"multicomp_n='from_models' but only 1 model is specified."
+            assert n_models > 1, "multicomp_n='from_models' but only 1 model is specified."
             self.multicomp_n = n_models
         else:
             assert isinstance(
@@ -176,7 +176,7 @@ class ModelBasedClassify(evals.Eval):
                 assert (
                     metric in test_sample
                 ), f"Missing label for metric '{metric}' in sample {test_sample.keys()}"
-                metrics[metric + "_metascore"] = choice == test_sample[metric]
+                metrics[f"{metric}_metascore"] = choice == test_sample[metric]
 
         evals.record.record_metrics(**metrics)
 
@@ -186,10 +186,10 @@ class ModelBasedClassify(evals.Eval):
         samples = self.get_samples()
 
         self.eval_all_samples(recorder, samples)
-        record_metrics = {}
-        record_metrics["invalid_request_during_completion"] = self.invalid_request_during_completion
-        record_metrics["invalid_request_during_evaluation"] = self.invalid_request_during_evaluation
-
+        record_metrics = {
+            "invalid_request_during_completion": self.invalid_request_during_completion,
+            "invalid_request_during_evaluation": self.invalid_request_during_evaluation,
+        }
         all_sample_metrics = recorder.get_metrics()
         if not all_sample_metrics:
             return record_metrics
@@ -211,12 +211,15 @@ class ModelBasedClassify(evals.Eval):
                 record_metrics[f"score/{metric}"] = sum(scores) / len(all_sample_metrics)
             # compute the counts and ratios
             counts = dict(Counter(chosen))
-            missing_samples = len(all_sample_metrics) - len(chosen)
-            if missing_samples:
+            if missing_samples := len(all_sample_metrics) - len(chosen):
                 counts["__missing_samples__"] = missing_samples
-            record_metrics.update({f"counts/{metric}/{k}": v for k, v in counts.items()})
+            record_metrics |= {f"counts/{metric}/{k}": v for k, v in counts.items()}
             if self.metaeval:
-                metascores = [m[metric + "_metascore"] for m in all_sample_metrics if metric in m]
+                metascores = [
+                    m[f"{metric}_metascore"]
+                    for m in all_sample_metrics
+                    if metric in m
+                ]
                 record_metrics[f"metascore/{metric}"] = sum(metascores) / len(all_sample_metrics)
 
         return record_metrics

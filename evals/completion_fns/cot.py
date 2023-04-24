@@ -31,7 +31,7 @@ class ChainOfThoughtCompletionFn(CompletionFn):
         registry_path: str = None,
         **kwargs
     ) -> None:
-        registry = Registry() if not registry else registry
+        registry = registry if registry else Registry()
         if registry_path:
             registry.add_registry_paths(registry_path)
 
